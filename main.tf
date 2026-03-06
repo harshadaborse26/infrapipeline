@@ -4,13 +4,13 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "6.26.0"
+      version = "~> 6.26"
     }
   }
 
   backend "s3" {
-    bucket  = "my-jenkins-bucket0203"
-    key     = "terraform.tfstate"
+    bucket  = "my-jenkins-bucket-ap-south-1"
+    key     = "eks/terraform.tfstate"
     region  = "ap-south-1"
     encrypt = true
   }
@@ -53,7 +53,7 @@ variable "cluster_name" {
 #################################
 
 resource "aws_iam_role" "eks_cluster_role" {
-  name = "eks-cluster-role"
+  name = "eks-cluster-role-23"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -75,7 +75,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 #################################
 
 resource "aws_iam_role" "node_role" {
-  name = "eks-node-role"
+  name = "eks-node-role-23"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -121,7 +121,7 @@ resource "aws_eks_cluster" "mycluster" {
 
 resource "aws_eks_node_group" "nodegroup" {
   cluster_name    = aws_eks_cluster.mycluster.name
-  node_group_name = "myb23-node-group"
+  node_group_name = "node-group-23"
   node_role_arn   = aws_iam_role.node_role.arn
   subnet_ids      = data.aws_subnets.default.ids
 
@@ -130,6 +130,8 @@ resource "aws_eks_node_group" "nodegroup" {
     min_size     = 1
     max_size     = 3
   }
+
+  instance_types = ["t3.micro"]
 
   depends_on = [
     aws_iam_role_policy_attachment.node_policies
